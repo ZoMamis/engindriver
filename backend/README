@@ -1,0 +1,212 @@
+# 🎼 Projet Symfony avec Docker
+
+Ce projet configure un environnement de développement Symfony complet avec Docker.
+
+## 🚀 Installation rapide
+
+### Prérequis
+- Docker
+- Docker Compose
+- Make (optionnel, pour utiliser les commandes simplifiées)
+
+### 1. Cloner et configurer le projet
+
+```bash
+# Créer le répertoire du projet
+mkdir mon-projet-symfony
+cd mon-projet-symfony
+
+# Créer la structure des dossiers
+mkdir -p docker/php docker/nginx docker/mysql
+```
+
+### 2. Installation automatique avec Make
+
+```bash
+# Installation complète en une commande
+make setup
+```
+
+### 3. Installation manuelle (alternative)
+
+```bash
+# Construire les images
+docker-compose build
+
+# Créer le projet Symfony
+docker-compose run --rm php symfony new . --webapp --no-git
+
+# Démarrer les conteneurs
+docker-compose up -d
+
+# Installer les dépendances
+docker-compose exec php composer install
+```
+
+## 📋 Services disponibles
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Application Symfony** | http://localhost:8080 | Application principale |
+| **phpMyAdmin** | http://localhost:8081 | Interface de gestion MySQL |
+| **MySQL** | localhost:3306 | Base de données |
+
+### Accès à la base de données
+- **Host** : localhost (depuis l'host) ou `database` (depuis les conteneurs)
+- **Port** : 3306
+- **Database** : symfony_db
+- **Username** : symfony
+- **Password** : symfony
+
+## 🛠️ Commandes utiles
+
+### Avec Make (recommandé)
+```bash
+make help          # Voir toutes les commandes disponibles
+make up            # Démarrer les conteneurs
+make down          # Arrêter les conteneurs
+make shell         # Accéder au conteneur PHP
+make logs          # Voir les logs
+make composer      # Installer les dépendances
+make migrate       # Exécuter les migrations
+make test          # Lancer les tests
+make clean         # Nettoyer tout
+```
+
+### Commandes Docker classiques
+```bash
+# Démarrer les services
+docker-compose up -d
+
+# Arrêter les services
+docker-compose down
+
+# Voir les logs
+docker-compose logs -f
+
+# Accéder au conteneur PHP
+docker-compose exec php bash
+
+# Exécuter des commandes Symfony
+docker-compose exec php php bin/console cache:clear
+docker-compose exec php php bin/console doctrine:database:create
+docker-compose exec php php bin/console make:controller
+```
+
+## 📁 Structure du projet
+
+```
+.
+├── docker/
+│   ├── php/
+│   │   ├── Dockerfile
+│   │   └── php.ini
+│   ├── nginx/
+│   │   ├── Dockerfile
+│   │   └── default.conf
+│   └── mysql/
+│       └── init.sql
+├── docker-compose.yml
+├── Makefile
+└── README.md
+```
+
+## 🔧 Configuration
+
+### Variables d'environnement
+
+Créez un fichier `.env.local` dans votre projet Symfony :
+
+```env
+# .env.local
+DATABASE_URL="mysql://symfony:symfony@database:3306/symfony_db"
+APP_ENV=dev
+APP_SECRET=your-secret-key
+```
+
+### Personnalisation
+
+- **PHP** : Modifiez `docker/php/php.ini` pour ajuster la configuration PHP
+- **Nginx** : Modifiez `docker/nginx/default.conf` pour la configuration web
+- **MySQL** : Modifiez `docker/mysql/init.sql` pour l'initialisation de la DB
+
+## 🐛 Dépannage
+
+### Problème de permissions
+```bash
+# Corriger les permissions
+sudo chown -R $USER:$USER .
+```
+
+### Reconstruire les conteneurs
+```bash
+# Nettoyer et reconstruire
+make clean
+make build
+make up
+```
+
+### Problème de ports occupés
+```bash
+# Vérifier les ports utilisés
+docker-compose ps
+netstat -tulpn | grep :8080
+```
+
+Modifiez les ports dans `docker-compose.yml` si nécessaire.
+
+## 📊 Développement
+
+### Commandes Symfony courantes
+
+```bash
+# Créer un contrôleur
+docker-compose exec php php bin/console make:controller
+
+# Créer une entité
+docker-compose exec php php bin/console make:entity
+
+# Créer une migration
+docker-compose exec php php bin/console make:migration
+
+# Exécuter les migrations
+docker-compose exec php php bin/console doctrine:migrations:migrate
+
+# Vider le cache
+docker-compose exec php php bin/console cache:clear
+```
+
+### Assets et Webpack
+
+Si vous utilisez Webpack Encore :
+
+```bash
+# Installer les dépendances Node.js
+docker-compose exec node npm install
+
+# Compiler les assets
+docker-compose exec node npm run build
+
+# Mode watch pour le développement
+docker-compose exec node npm run watch
+```
+
+## 🚀 Production
+
+Pour la production, modifiez :
+
+1. **docker-compose.prod.yml** avec des configurations optimisées
+2. **Variables d'environnement** pour la production
+3. **Configuration Nginx** pour les performances
+4. **Configuration PHP** (désactiver les erreurs, optimiser OPcache)
+
+## 📝 Notes
+
+- Les données MySQL sont persistées dans un volume Docker
+- Les logs sont disponibles via `docker-compose logs`
+- Le hot reload est activé pour le développement
+- phpMyAdmin est accessible pour la gestion de la DB
+
+---
+
+**Rakotondrasoa Zo 🎉**
